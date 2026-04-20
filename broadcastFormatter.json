@@ -1,0 +1,10 @@
+[
+    {
+        "event_signature": "BroadcastNotification(address,string,string)",
+        "filter": "",
+        "icon": "https://ipfs.io/ipfs/bafkreidt5gy7m2h4hoyroznkfqzydtqlwrbw25cxcsold737rl7dw6duym",
+        "title": "Broadcast Notification | {{event.subject}}",
+        "message": "{{event.message}} | Please view broadcast details at: ipfs://NotifierDapp/#message-{{event.transactionHash}}",
+        "click": "https://localhost:3000/notification/{{event.transactionHash}}?type=broadcast"
+    }
+]

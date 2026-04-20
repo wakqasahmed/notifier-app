@@ -1,0 +1,10 @@
+[
+    {
+        "event_signature": "DirectNotification(address,address,string,string)",
+        "filter": "event.to == wallet.address",
+        "icon": "https://ipfs.io/ipfs/bafkreiazqif7l5kbnxumnqpgim5qyepltj3jxqkyakoiqki74fyv4qnsua",
+        "title": "Direct Notification | {{event.subject}}",
+        "message": "You have a direct message from {{event.from}}: {{event.message}}",
+        "click": "https://localhost:3000/notification/{{event.transactionHash}}?type=direct"
+    }
+]
