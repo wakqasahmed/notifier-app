@@ -49,6 +49,17 @@ function FormatterSettings({ notifierContract }) {
     }
   }
 
+  if (!notifierContract) {
+    return (
+      <div className="max-w-lg p-4 bg-yellow-900/30 border border-yellow-700 rounded-xl text-sm text-yellow-300">
+        <strong>Contract not connected.</strong> Make sure your <code className="font-mono">.env</code> file
+        has valid <code className="font-mono">REACT_APP_NOTIFIER_ADDRESS</code> and
+        <code className="font-mono"> REACT_APP_USECASES_ADDRESS</code> values from your Ganache
+        deployment, then restart <code className="font-mono">npm start</code>.
+      </div>
+    );
+  }
+
   return (
     <div className="max-w-lg space-y-6">
       <div>
