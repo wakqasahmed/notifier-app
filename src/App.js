@@ -12,28 +12,39 @@ import SendNotificationForm from "./components/SendNotificationForm";
 import UseCaseDemoPanel from "./components/UseCaseDemoPanel";
 import FormatterSettings from "./components/FormatterSettings";
 
+// JSON ABI format — avoids ethers.js using eval() to parse human-readable strings,
+// which violates Content Security Policy (no unsafe-eval).
 const notifierAbi = [
-  "event AttestDirectFormatter(string uri)",
-  "event AttestBroadcastFormatter(string uri)",
-  "event DirectNotification(address indexed from, address indexed to, string subject, string message)",
-  "event BroadcastNotification(address indexed from, string subject, string message)",
-  "function directFormatterURI() view returns (string)",
-  "function broadcastFormatterURI() view returns (string)",
-  "function sendDirectNotification(address to, string subject, string message)",
-  "function broadcastNotification(string subject, string message)",
-  "function setDirectFormatterURI(string _uri)",
-  "function setBroadcastFormatterURI(string _uri)",
+  { type: "event", name: "AttestDirectFormatter", inputs: [{ name: "uri", type: "string", indexed: false }] },
+  { type: "event", name: "AttestBroadcastFormatter", inputs: [{ name: "uri", type: "string", indexed: false }] },
+  { type: "event", name: "DirectNotification", inputs: [
+    { name: "from", type: "address", indexed: true },
+    { name: "to",   type: "address", indexed: true },
+    { name: "subject", type: "string", indexed: false },
+    { name: "message", type: "string", indexed: false },
+  ]},
+  { type: "event", name: "BroadcastNotification", inputs: [
+    { name: "from",    type: "address", indexed: true },
+    { name: "subject", type: "string",  indexed: false },
+    { name: "message", type: "string",  indexed: false },
+  ]},
+  { type: "function", name: "directFormatterURI",   stateMutability: "view",        inputs: [],                                                                                                              outputs: [{ name: "", type: "string" }] },
+  { type: "function", name: "broadcastFormatterURI", stateMutability: "view",       inputs: [],                                                                                                              outputs: [{ name: "", type: "string" }] },
+  { type: "function", name: "sendDirectNotification", stateMutability: "nonpayable", inputs: [{ name: "to", type: "address" }, { name: "subject", type: "string" }, { name: "message", type: "string" }], outputs: [] },
+  { type: "function", name: "broadcastNotification",  stateMutability: "nonpayable", inputs: [{ name: "subject", type: "string" }, { name: "message", type: "string" }],                                  outputs: [] },
+  { type: "function", name: "setDirectFormatterURI",   stateMutability: "nonpayable", inputs: [{ name: "_uri", type: "string" }], outputs: [] },
+  { type: "function", name: "setBroadcastFormatterURI", stateMutability: "nonpayable", inputs: [{ name: "_uri", type: "string" }], outputs: [] },
 ];
 
 const useCasesAbi = [
-  "function triggerCTANotification(address recipient)",
-  "function triggerDAOVoteNotification(uint256 proposalId)",
-  "function triggerDEXNotification(uint256 currentPrice)",
-  "function triggerNFTOfferNotification(address nftOwner, uint256 nftId)",
-  "function triggerMetaverseEventNotification(uint256 eventId)",
-  "function triggerENSDomainExpiration(address domainOwner, string domainName)",
-  "function triggerAnonymousCollaboration()",
-  "function triggerSocialRecoveryNotification(address recipient)",
+  { type: "function", name: "triggerCTANotification",            stateMutability: "nonpayable", inputs: [{ name: "recipient",  type: "address" }],                                              outputs: [] },
+  { type: "function", name: "triggerDAOVoteNotification",        stateMutability: "nonpayable", inputs: [{ name: "proposalId", type: "uint256" }],                                              outputs: [] },
+  { type: "function", name: "triggerDEXNotification",            stateMutability: "nonpayable", inputs: [{ name: "currentPrice", type: "uint256" }],                                            outputs: [] },
+  { type: "function", name: "triggerNFTOfferNotification",       stateMutability: "nonpayable", inputs: [{ name: "nftOwner", type: "address" }, { name: "nftId", type: "uint256" }],           outputs: [] },
+  { type: "function", name: "triggerMetaverseEventNotification", stateMutability: "nonpayable", inputs: [{ name: "eventId",   type: "uint256" }],                                              outputs: [] },
+  { type: "function", name: "triggerENSDomainExpiration",        stateMutability: "nonpayable", inputs: [{ name: "domainOwner", type: "address" }, { name: "domainName", type: "string" }],   outputs: [] },
+  { type: "function", name: "triggerAnonymousCollaboration",     stateMutability: "nonpayable", inputs: [],                                                                                    outputs: [] },
+  { type: "function", name: "triggerSocialRecoveryNotification", stateMutability: "nonpayable", inputs: [{ name: "recipient",  type: "address" }],                                              outputs: [] },
 ];
 
 const notifierAddress = process.env.REACT_APP_NOTIFIER_ADDRESS;

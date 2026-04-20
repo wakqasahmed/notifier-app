@@ -1,9 +1,8 @@
 import React, { useState } from "react";
 
-function convertIPFSToHTTP(uri) {
-  const gateway =
-    process.env.REACT_APP_IPFS_GATEWAY || "https://ipfs.io/ipfs/";
+function resolveIPFS(uri) {
   if (uri && uri.startsWith("ipfs://")) {
+    const gateway = process.env.REACT_APP_IPFS_GATEWAY || "https://ipfs.io/ipfs/";
     return uri.replace("ipfs://", gateway);
   }
   return uri;
@@ -57,15 +56,15 @@ function NotificationFeed({ notifications }) {
         </div>
       ) : (
         <div className="space-y-3">
-          {filtered.map((n, index) => (
+          {filtered.map((n) => (
             <div
-              key={index}
+              key={`${n.transactionHash}-${n.type}`}
               className="bg-gray-800 border border-gray-700 rounded-xl p-4 hover:border-gray-500 transition-colors"
             >
               <div className="flex items-start gap-3">
                 {n.formatted?.icon && (
                   <img
-                    src={convertIPFSToHTTP(n.formatted.icon)}
+                    src={resolveIPFS(n.formatted.icon)}
                     alt=""
                     className="w-10 h-10 rounded-lg mt-0.5"
                   />
