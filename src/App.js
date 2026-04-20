@@ -39,12 +39,36 @@ const useCasesAbi = [
 const notifierAddress = process.env.REACT_APP_NOTIFIER_ADDRESS;
 const useCasesAddress = process.env.REACT_APP_USECASES_ADDRESS;
 
-function convertIPFSToHTTP(uri) {
-  const gateway = process.env.REACT_APP_IPFS_GATEWAY || "https://ipfs.io/ipfs/";
-  if (uri && uri.startsWith("ipfs://")) {
-    return uri.replace("ipfs://", gateway);
+const IPFS_GATEWAYS = [
+  process.env.REACT_APP_IPFS_GATEWAY,
+  "https://ipfs.io/ipfs/",
+  "https://gateway.pinata.cloud/ipfs/",
+  "https://cloudflare-ipfs.com/ipfs/",
+  "https://dweb.link/ipfs/",
+].filter(Boolean);
+
+function getCID(uri) {
+  if (uri && uri.startsWith("ipfs://")) return uri.slice("ipfs://".length);
+  // Already an HTTP gateway URL — extract the CID portion after /ipfs/
+  const match = uri && uri.match(/\/ipfs\/(.+)/);
+  return match ? match[1] : null;
+}
+
+async function fetchIPFS(uri) {
+  const cid = getCID(uri);
+  const urls = cid
+    ? IPFS_GATEWAYS.map((gw) => gw + cid)
+    : [uri]; // plain HTTP URL, try as-is
+
+  for (const url of urls) {
+    try {
+      const res = await fetch(url);
+      if (res.ok) return res;
+    } catch {
+      // gateway unreachable, try next
+    }
   }
-  return uri;
+  throw new Error(`All IPFS gateways failed for: ${uri}`);
 }
 
 function applyTemplate(template, eventData) {
@@ -149,9 +173,8 @@ function App() {
       listenerContract = new Contract(notifierAddress, notifierAbi, provider);
 
       async function fetchDirectFormatter(uri) {
-        const httpURI = convertIPFSToHTTP(uri);
         try {
-          const response = await fetch(httpURI);
+          const response = await fetchIPFS(uri);
           const json = await response.json();
           if (Array.isArray(json) && json.length > 0) {
             setDirectFormatter(json[0]);
@@ -162,9 +185,8 @@ function App() {
       }
 
       async function fetchBroadcastFormatter(uri) {
-        const httpURI = convertIPFSToHTTP(uri);
         try {
-          const response = await fetch(httpURI);
+          const response = await fetchIPFS(uri);
           const json = await response.json();
           if (Array.isArray(json) && json.length > 0) {
             setBroadcastFormatter(json[0]);
